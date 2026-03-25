@@ -44,7 +44,7 @@
 		"play": "vite --host",
 		"test": "vitest",
 		"test:bench": "vitest bench",
-		"test:run": "vitest run",
+		"test:run": "vitest run --passWithNoTests",
 		"test:coverage": "vitest run --coverage",
 		"lint": "oxlint --type-aware",
 		"lint:fix": "oxlint --fix --type-aware",
