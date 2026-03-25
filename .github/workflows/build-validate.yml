@@ -1,0 +1,46 @@
+name: build-validate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  build-validate:
+    name: build-validate
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          version: 10
+
+      - name: Install Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '>=22.18.0'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Run Oxlint
+        run: pnpm lint
+
+      - name: Run Oxfmt
+        run: pnpm fmt:check
+
+      - name: Run Tests
+        run: pnpm test:run
+
+      - name: Build project
+        run: pnpm build
