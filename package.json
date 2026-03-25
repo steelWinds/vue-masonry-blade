@@ -1,0 +1,100 @@
+{
+	"name": "masonry-vue-blade",
+	"version": "0.0.1",
+	"private": false,
+	"description": "A component written as an implementation of the masonry-blade library",
+	"keywords": [
+		"balanced",
+		"balanced-masonry",
+		"masonry",
+		"masonry-grid",
+		"masonry-vue",
+		"ui",
+		"ui-component"
+	],
+	"homepage": "https://github.com/steelWinds/masonry-vue-blade",
+	"bugs": {
+		"url": "https://github.com/steelWinds/masonry-vue-blade/issues",
+		"email": "kirillsurov0@gmail.com"
+	},
+	"license": "MPL-2.0",
+	"author": "steelWinds",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/steelWinds/masonry-vue-blade.git"
+	},
+	"files": [
+		"build",
+		"README.md",
+		"README.ru.md",
+		"LICENSE"
+	],
+	"type": "module",
+	"types": "./build/index.d.ts",
+	"exports": {
+		".": "./build/index.js",
+		"./package.json": "./package.json"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "tsdown --minify",
+		"build:watch": "tsdown --sourcemap --watch",
+		"play": "vite --host",
+		"test": "vitest",
+		"test:bench": "vitest bench",
+		"test:run": "vitest run",
+		"test:coverage": "vitest run --coverage",
+		"lint": "oxlint --type-aware",
+		"lint:fix": "oxlint --fix --type-aware",
+		"nano-staged": "nano-staged",
+		"fmt": "oxfmt",
+		"fmt:check": "oxfmt --check",
+		"prepare": "husky"
+	},
+	"dependencies": {
+		"@vueuse/core": "^14.2.1",
+		"masonry-blade": "2.0.0"
+	},
+	"devDependencies": {
+		"@arethetypeswrong/core": "^0.18.2",
+		"@tsdown/css": "^0.21.5",
+		"@types/node": "^25.5.0",
+		"@vitejs/plugin-vue": "^6.0.5",
+		"@vitest/browser-playwright": "^4.1.1",
+		"bumpp": "^11.0.1",
+		"husky": "^9.1.7",
+		"nano-staged": "^0.9.0",
+		"oxfmt": "^0.42.0",
+		"oxlint": "^1.57.0",
+		"oxlint-tsgolint": "^0.17.4",
+		"playwright": "^1.58.2",
+		"publint": "^0.3.18",
+		"tsdown": "^0.21.5",
+		"typescript": "^5.9.3",
+		"unplugin-remove": "^1.0.3",
+		"vite": "^8.0.2",
+		"vitest": "^4.1.1",
+		"vitest-browser-vue": "^2.1.0",
+		"vue": "^3.5.31",
+		"vue-tsc": "^3.2.6"
+	},
+	"peerDependencies": {
+		"vue": "^3.0.0"
+	},
+	"nano-staged": {
+		"*": "oxfmt --no-error-on-unmatched-pattern",
+		"*.{js,jsx,ts,tsx,mjs,cjs}": [
+			"pnpm run lint",
+			"pnpm run test:run --passWithNoTests"
+		]
+	},
+	"engines": {
+		"node": ">=22.18.0"
+	},
+	"volta": {
+		"node": "22.18.0",
+		"pnpm": "10.32.1"
+	}
+}
