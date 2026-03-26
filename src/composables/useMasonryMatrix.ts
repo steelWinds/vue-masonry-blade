@@ -5,22 +5,17 @@ import {
 	type ReadonlySortItems,
 } from 'masonry-blade';
 import {
-	type MaybeRef,
-	type TemplateRef,
-	computed,
-	shallowRef,
-	unref,
-} from 'vue';
-import {
+	type MaybeComputedElementRef,
 	tryOnBeforeUnmount,
 	useElementSize,
 	watchDebounced,
 } from '@vueuse/core';
+import { type MaybeRef, computed, shallowRef, unref } from 'vue';
 
 export type Breakpoints = Readonly<Record<number, number>>;
 
 export const useMasonryMatrix = <Meta = undefined>(
-	rootRef: TemplateRef,
+	rootRef: MaybeComputedElementRef,
 	gap: MaybeRef<number>,
 	columnCount: MaybeRef<number>,
 	breakpoints?: MaybeRef<Breakpoints | undefined>,
@@ -31,8 +26,9 @@ export const useMasonryMatrix = <Meta = undefined>(
 		[],
 	);
 	const containerHeight = shallowRef(0);
-
 	const { width } = useElementSize(rootRef);
+
+	let operationQueue: Promise<unknown> = Promise.resolve();
 
 	const normalizedBreakpoints = computed(() =>
 		Object.entries(unref(breakpoints) ?? {})
@@ -43,7 +39,6 @@ export const useMasonryMatrix = <Meta = undefined>(
 			)
 			.sort((a, b) => a[0] - b[0]),
 	);
-
 	const resolvedColumnCount = computed(() =>
 		normalizedBreakpoints.value.reduce(
 			(columns, [minWidth, breakpointColumns]) =>
@@ -51,12 +46,9 @@ export const useMasonryMatrix = <Meta = undefined>(
 			unref(columnCount),
 		),
 	);
-
 	const isLayoutReady = computed(
 		() => width.value > 0 && resolvedColumnCount.value > 0,
 	);
-
-	let operationQueue: Promise<unknown> = Promise.resolve();
 
 	const runExclusive = <T>(task: () => Promise<T>): Promise<T> => {
 		const nextTask = operationQueue.then(task, task);
@@ -68,7 +60,6 @@ export const useMasonryMatrix = <Meta = undefined>(
 
 		return nextTask;
 	};
-
 	const ensureMatrix = (): MasonryMatrix<Meta> | null => {
 		if (!isLayoutReady.value) {
 			return null;
@@ -84,7 +75,6 @@ export const useMasonryMatrix = <Meta = undefined>(
 
 		return matrix.value;
 	};
-
 	const recreate = async (
 		items: readonly Readonly<MatrixSourceUnit<Meta>>[] = sourceItems.value,
 	): Promise<ReadonlyMatrix<Meta>> => {
@@ -92,6 +82,7 @@ export const useMasonryMatrix = <Meta = undefined>(
 
 		if (!isLayoutReady.value) {
 			matrixColumns.value = [];
+
 			return matrixColumns.value;
 		}
 
@@ -121,7 +112,6 @@ export const useMasonryMatrix = <Meta = undefined>(
 			return columns;
 		});
 	};
-
 	const append = async (
 		items: readonly Readonly<MatrixSourceUnit<Meta>>[],
 	): Promise<ReadonlyMatrix<Meta>> => {
@@ -154,7 +144,6 @@ export const useMasonryMatrix = <Meta = undefined>(
 			return columns;
 		});
 	};
-
 	const sort = async (
 		source: ReadonlyMatrix<Meta> = matrixColumns.value,
 	): Promise<ReadonlySortItems<Meta>> => {
@@ -166,11 +155,8 @@ export const useMasonryMatrix = <Meta = undefined>(
 	};
 
 	const clear = () => recreate([]);
-
 	const terminateWorker = () => matrix.value?.terminateWorker();
-
 	const disableWorker = () => matrix.value?.disableWorker();
-
 	const enableWorker = () => matrix.value?.enableWorker();
 
 	watchDebounced(

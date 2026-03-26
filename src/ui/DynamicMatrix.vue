@@ -1,19 +1,10 @@
-<script setup lang="ts">
-import {
-	type Breakpoints,
-	useMasonryMatrix,
-} from '../composables/useMasonryMatrix';
+<script setup lang="ts" generic="Meta">
 import { computed, useTemplateRef } from 'vue';
-import { getPositionedStyle } from '../lib/getPositionedStyle';
-import { useVirtualMasonry } from '../composables/useVirtualMasonry';
+import { useMasonryMatrix, useVirtualMasonry } from 'src/composables';
+import type { DynamicMatrixProps } from './DynamicMatrix.types';
+import { getPositionedStyle } from 'src/lib';
 
-interface Props {
-	columnCount?: number;
-	gap?: number;
-	breakpoints?: Breakpoints;
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<DynamicMatrixProps<Meta>>(), {
 	columnCount: 1,
 	gap: 10,
 });
@@ -21,14 +12,19 @@ const props = withDefaults(defineProps<Props>(), {
 const rootRef = useTemplateRef('root');
 
 const { matrix, append, matrixColumns, containerHeight } =
-	useMasonryMatrix<any>(
+	useMasonryMatrix<Meta>(
 		rootRef,
 		computed(() => props.gap),
 		computed(() => props.columnCount),
 		computed(() => props.breakpoints),
 	);
 
-const { visibleItems } = useVirtualMasonry<any>(rootRef, matrix, matrixColumns);
+const { visibleItems } = useVirtualMasonry<Meta>(
+	rootRef,
+	matrix,
+	matrixColumns,
+	{ overscanPx: computed(() => props.overscanPx) },
+);
 
 const containerStyle = computed(() => ({
 	height: `${containerHeight.value}px`,
@@ -40,7 +36,7 @@ defineExpose({ append });
 <template>
 	<div class="masonry" ref="root" :style="containerStyle">
 		<template v-for="item of visibleItems" :key="item.id">
-			<slot :item :positioned-style="getPositionedStyle(item)" />
+			<slot :item :positioned-style="getPositionedStyle<Meta>(item)" />
 		</template>
 	</div>
 </template>

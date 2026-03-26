@@ -6,14 +6,14 @@ import {
 } from 'masonry-blade';
 import {
 	type MaybeRef,
+	type MaybeRefOrGetter,
 	type Ref,
-	type TemplateRef,
 	computed,
 	shallowRef,
 	unref,
 	watch,
 } from 'vue';
-import { useElementBounding, useWindowSize } from '@vueuse/core';
+import { useElementBounding, useParentElement } from '@vueuse/core';
 
 export interface UseVirtualMasonryOptions {
 	overscanPx?: MaybeRef<number | undefined>;
@@ -42,23 +42,24 @@ export const lowerBoundByBottom = <Meta = undefined>(
 };
 
 export const useVirtualMasonry = <Meta = undefined>(
-	rootRef: TemplateRef,
+	rootRef: MaybeRefOrGetter,
 	matrix: Ref<MasonryMatrix<Meta> | null>,
 	matrixColumns: Ref<ReadonlyMatrix<Meta>>,
 	options: UseVirtualMasonryOptions = {},
 ) => {
+	const el = useParentElement(rootRef);
+
+	const { height: viewportHeight } = useElementBounding(el);
+
 	const { top } = useElementBounding(rootRef, {
 		immediate: true,
 		windowResize: true,
 		windowScroll: true,
 	});
 
-	const { height: viewportHeight } = useWindowSize();
-
-	const overscanPx = computed(() => {
-		const value = unref(options.overscanPx);
-		return value ?? Math.round(viewportHeight.value * 0.75);
-	});
+	const overscanPx = computed(
+		() => unref(options.overscanPx) ?? Math.round(viewportHeight.value * 0.75),
+	);
 
 	const containerViewportOffset = computed(() => Math.max(0, -top.value));
 

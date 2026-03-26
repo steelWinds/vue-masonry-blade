@@ -1,120 +1,242 @@
 <script setup lang="ts">
-import { onMounted, useTemplateRef } from 'vue';
-import { DynamicMatrix } from '../../src';
+import './playground.css';
+import {
+	type ComponentPublicInstance,
+	computed,
+	nextTick,
+	onMounted,
+	ref,
+	useTemplateRef,
+	watch,
+} from 'vue';
+import { DynamicMatrix } from 'src/index';
+// @ts-expect-error
+import LOGO_SRC from './logo.png?url';
 import type { MatrixComputedUnit } from 'masonry-blade';
+import { useMutationObserver } from '@vueuse/core';
 import { usePicsumImages } from '../helpers/usePicsumImages';
 
-const masonryRef = useTemplateRef('masonry');
-
-const { fetchImages } = usePicsumImages();
-
-const append = async (mode: 'replace' | 'pagination') => {
-	const images = await fetchImages(32, mode);
-
-	await masonryRef.value?.append(images as any);
+type DemoMeta = {
+	src: string;
+	author?: string;
 };
 
-const buildSrcURL = (item: MatrixComputedUnit<any>) =>
-	`${item.meta.src}/${Math.round(item.width)}/${Math.round(item.height)}`;
+type DynamicMatrixPublicInstance = ComponentPublicInstance & {
+	$el: HTMLElement;
+	append?: (items: readonly unknown[]) => Promise<void> | void;
+};
 
-onMounted(() => append('replace'));
+const masonryRef = useTemplateRef<DynamicMatrixPublicInstance>('masonry');
+
+const { fetchImages, buffer } = usePicsumImages();
+
+const NPM_URL = 'https://www.npmjs.com/package/masonry-vue-blade';
+
+const MIN_COLUMNS = 1;
+const MAX_COLUMNS = 12;
+const INITIAL_COLUMNS = 4;
+
+const columnCount = ref<number>(INITIAL_COLUMNS);
+const isLoading = ref(false);
+const renderedDomItemsSource = ref(0);
+
+const masonryEl = computed<HTMLElement | null>(
+	() => masonryRef.value?.$el ?? null,
+);
+const renderedDomItemsCount = computed(() => renderedDomItemsSource.value);
+
+const syncRenderedDomItemsCount = (): void => {
+	renderedDomItemsSource.value =
+		masonryEl.value?.querySelectorAll('[data-masonry-card]').length ?? 0;
+};
+
+const handleColumnCountInput = (event: Event): void => {
+	const target = event.target as HTMLInputElement;
+	const value = Number(target.value);
+
+	columnCount.value = Number.isFinite(value)
+		? Math.min(MAX_COLUMNS, Math.max(MIN_COLUMNS, value))
+		: INITIAL_COLUMNS;
+};
+
+const append = async (mode: 'replace' | 'pagination'): Promise<void> => {
+	if (isLoading.value) {
+		return;
+	}
+
+	isLoading.value = true;
+
+	try {
+		const images = await fetchImages(32, mode);
+		await masonryRef.value?.append?.(images as readonly unknown[]);
+
+		await nextTick();
+		syncRenderedDomItemsCount();
+	} finally {
+		isLoading.value = false;
+	}
+};
+
+const buildSrcURL = (item: MatrixComputedUnit<DemoMeta>): string =>
+	`${item.meta?.src}/${Math.round(item.width)}/${Math.round(item.height)}`;
+
+useMutationObserver(
+	masonryEl,
+	async () => {
+		await nextTick();
+		syncRenderedDomItemsCount();
+	},
+	{
+		childList: true,
+		subtree: true,
+	},
+);
+
+watch(
+	[masonryEl, () => buffer.value.length, columnCount],
+	async () => {
+		await nextTick();
+
+		syncRenderedDomItemsCount();
+	},
+	{ flush: 'post' },
+);
+
+onMounted(async () => {
+	await append('replace');
+	await nextTick();
+	syncRenderedDomItemsCount();
+});
 </script>
 
 <template>
-	<div class="container">
-		<DynamicMatrix
-			ref="masonry"
-			class="masonry"
-			:breakpoints="{
-				320: 2,
-				540: 4,
-				840: 6,
-			}"
-		>
-			<template v-slot="{ item, positionedStyle }">
-				<div :style="positionedStyle" class="container__item">
-					<div class="container__item-wrapper">
-						<div class="container__meta">
-							<span class="container__meta-item"> ID: {{ item.id }} </span>
+	<div class="playground-shell">
+		<div class="playground-bg" />
 
-							<span class="container__meta-item">
-								{{ item.meta.author }}
-							</span>
-						</div>
+		<div class="playground">
+			<header class="hero">
+				<div class="hero__content">
+					<div class="hero__eyebrow">Vue masonry playground</div>
+
+					<h1 class="hero__title">masonry-vue-blade</h1>
+
+					<p class="hero__description">
+						Minimal Vue wrapper for fast masonry layouts with internal scroll,
+						virtualized rendering, and a live DOM counter for the visible
+						mounted cards.
+					</p>
+
+					<div class="hero__actions">
+						<a
+							class="hero__button hero__button--primary"
+							:href="NPM_URL"
+							target="_blank"
+							rel="noreferrer"
+						>
+							View on NPM
+						</a>
 					</div>
 
-					<img class="container__img" :src="buildSrcURL(item)" alt="" />
-				</div>
-			</template>
-		</DynamicMatrix>
+					<div class="hero__controls">
+						<label class="hero__control" for="column-count">
+							<div class="hero__control-row">
+								<span class="hero__control-label">Columns</span>
+								<strong class="hero__control-value">{{ columnCount }}</strong>
+							</div>
 
-		<button class="container__btn" @click="append('pagination')">
-			Load More
-		</button>
+							<input
+								id="column-count"
+								class="hero__range"
+								type="range"
+								:min="MIN_COLUMNS"
+								:max="MAX_COLUMNS"
+								step="1"
+								:value="columnCount"
+								@input="handleColumnCountInput"
+							/>
+
+							<div class="hero__range-meta" aria-hidden="true">
+								<span>{{ MIN_COLUMNS }}</span>
+								<span>{{ MAX_COLUMNS }}</span>
+							</div>
+						</label>
+					</div>
+
+					<div class="hero__stats" aria-label="Playground stats">
+						<div class="hero__stat">
+							<span class="hero__stat-label">Rendered DOM</span>
+							<strong class="hero__stat-value">
+								{{ renderedDomItemsCount }}
+							</strong>
+						</div>
+
+						<div class="hero__stat">
+							<span class="hero__stat-label">Columns</span>
+							<strong class="hero__stat-value">{{ columnCount }}</strong>
+						</div>
+					</div>
+				</div>
+
+				<div class="hero__brand">
+					<div class="hero__logo-card">
+						<img
+							class="hero__logo"
+							:src="LOGO_SRC"
+							alt="masonry-vue-blade logo"
+						/>
+					</div>
+				</div>
+			</header>
+
+			<main class="gallery-section">
+				<div class="gallery-section__header">
+					<div>
+						<h2 class="gallery-section__title">Scroll Area</h2>
+						<p class="gallery-section__subtitle">
+							The counter above shows how many cards are actually mounted inside
+							the DynamicMatrix root right now.
+						</p>
+					</div>
+
+					<button
+						class="gallery-section__action"
+						type="button"
+						:disabled="isLoading"
+						@click="append('pagination')"
+					>
+						{{ isLoading ? 'Loading...' : 'Load more' }}
+					</button>
+				</div>
+
+				<div class="gallery-frame">
+					<DynamicMatrix
+						ref="masonry"
+						class="masonry"
+						:column-count="columnCount"
+						:items="buffer"
+					>
+						<template #default="{ item, positionedStyle }">
+							<article :style="positionedStyle" class="card" data-masonry-card>
+								<div class="card__meta">
+									<span class="card__badge">#{{ item.id }}</span>
+
+									<span class="card__badge">
+										{{ item.meta?.author ?? 'Unknown author' }}
+									</span>
+								</div>
+
+								<img
+									class="card__image"
+									:src="buildSrcURL(item)"
+									:alt="item.meta?.author ?? `Image ${item.id}`"
+									loading="lazy"
+									decoding="async"
+								/>
+							</article>
+						</template>
+					</DynamicMatrix>
+				</div>
+			</main>
+		</div>
 	</div>
 </template>
-
-<style>
-.masonry {
-	position: relative;
-	width: 100%;
-}
-
-.container {
-	width: 100%;
-	height: 100vh;
-	margin: 0 auto;
-	overflow: hidden auto;
-	padding: 10px;
-	scrollbar-gutter: stable;
-}
-
-.container__btn {
-	display: block;
-	margin: 20px auto;
-	width: 240px;
-	background-color: beige;
-	border: 0;
-	padding: 20px;
-	cursor: pointer;
-}
-
-.container__item {
-	position: absolute;
-	inset: 0;
-	border-radius: 12px;
-	overflow: hidden;
-	transition: all 0.3s ease;
-	background-color: oklch(51.585% 0.01072 258.432);
-}
-
-.container__item-wrapper {
-	position: relative;
-}
-
-.container__meta {
-	position: absolute;
-	top: 6px;
-	left: 6px;
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 4px;
-	z-index: 2;
-}
-
-.container__meta-item {
-	background-color: white;
-	padding: 2px 10px;
-	border-radius: calc(infinity * 1px);
-	font-size: 14px;
-}
-
-.container__img {
-	width: calc(100% + 2px);
-	height: calc(100% + 2px);
-	margin: -1px 0 0 -1px;
-	object-fit: cover;
-	z-index: 1;
-}
-</style>
