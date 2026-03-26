@@ -55,7 +55,7 @@
 	},
 	"dependencies": {
 		"@vueuse/core": "^14.2.1",
-		"masonry-blade": "2.0.0"
+		"masonry-blade": "2.0.2"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/core": "^0.18.2",
@@ -97,5 +97,10 @@
 	"volta": {
 		"node": "22.18.0",
 		"pnpm": "10.32.1"
+	},
+	"pnpm": {
+		"overrides": {
+			"masonry-blade": "2.0.2"
+		}
 	}
 }
