@@ -1,1 +1,1 @@
-# masonry-vue-blade
+# vue-masonry-blade

@@ -128,6 +128,7 @@ export const useVirtualMasonry = <Meta = undefined>(
 
 		if (activeSort) {
 			rerunRequested = true;
+
 			return;
 		}
 

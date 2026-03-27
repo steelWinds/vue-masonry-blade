@@ -1,5 +1,5 @@
 {
-	"name": "masonry-vue-blade",
+	"name": "vue-masonry-blade",
 	"version": "0.0.1",
 	"private": false,
 	"description": "A component written as an implementation of the masonry-blade library",
@@ -12,16 +12,16 @@
 		"ui",
 		"ui-component"
 	],
-	"homepage": "https://github.com/steelWinds/masonry-vue-blade",
+	"homepage": "https://github.com/steelWinds/vue-masonry-blade",
 	"bugs": {
-		"url": "https://github.com/steelWinds/masonry-vue-blade/issues",
+		"url": "https://github.com/steelWinds/vue-masonry-blade/issues",
 		"email": "kirillsurov0@gmail.com"
 	},
 	"license": "MPL-2.0",
 	"author": "steelWinds",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/steelWinds/masonry-vue-blade.git"
+		"url": "git+https://github.com/steelWinds/vue-masonry-blade.git"
 	},
 	"files": [
 		"build",
@@ -55,7 +55,7 @@
 	},
 	"dependencies": {
 		"@vueuse/core": "^14.2.1",
-		"masonry-blade": "2.0.2"
+		"masonry-blade": "^2.0.2"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/core": "^0.18.2",
@@ -63,22 +63,21 @@
 		"@tsdown/css": "^0.21.5",
 		"@types/node": "^25.5.0",
 		"@vitejs/plugin-vue": "^6.0.5",
-		"@vitest/browser-playwright": "^4.1.1",
 		"@vitest/coverage-v8": "^4.1.1",
+		"@vue/test-utils": "^2.4.6",
 		"fast-check": "^4.6.0",
 		"husky": "^9.1.7",
+		"jsdom": "^29.0.1",
 		"nano-staged": "^0.9.0",
 		"oxfmt": "^0.42.0",
 		"oxlint": "^1.57.0",
 		"oxlint-tsgolint": "^0.17.4",
-		"playwright": "^1.58.2",
 		"publint": "^0.3.18",
 		"tsdown": "^0.21.5",
 		"typescript": "^5.9.3",
 		"unplugin-remove": "^1.0.3",
 		"vite": "^8.0.2",
 		"vitest": "^4.1.1",
-		"vitest-browser-vue": "^2.1.0",
 		"vue": "^3.5.31",
 		"vue-tsc": "^3.2.6"
 	},

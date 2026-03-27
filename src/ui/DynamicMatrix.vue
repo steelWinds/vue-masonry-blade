@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="Meta">
+<script setup lang="ts" generic="Meta = any">
 import { computed, useTemplateRef } from 'vue';
 import { useMasonryMatrix, useVirtualMasonry } from 'src/composables';
 import type { DynamicMatrixProps } from './DynamicMatrix.types';

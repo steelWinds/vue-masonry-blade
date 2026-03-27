@@ -30,8 +30,6 @@ const masonryRef = useTemplateRef<DynamicMatrixPublicInstance>('masonry');
 
 const { fetchImages, buffer } = usePicsumImages();
 
-const NPM_URL = 'https://www.npmjs.com/package/masonry-vue-blade';
-
 const MIN_COLUMNS = 1;
 const MAX_COLUMNS = 12;
 const INITIAL_COLUMNS = 4;
@@ -116,24 +114,42 @@ onMounted(async () => {
 		<div class="playground">
 			<header class="hero">
 				<div class="hero__content">
-					<div class="hero__eyebrow">Vue masonry playground</div>
+					<div class="hero__eyebrow">
+						<a href="https://github.com/steelWinds" target="_blank">
+							@steelwinds
+						</a>
+					</div>
 
-					<h1 class="hero__title">masonry-vue-blade</h1>
+					<h1 class="hero__title">vue-masonry-blade</h1>
 
 					<p class="hero__description">
-						Minimal Vue wrapper for fast masonry layouts with internal scroll,
-						virtualized rendering, and a live DOM counter for the visible
-						mounted cards.
+						A wrapper for
+						<code style="text-decoration: underline"
+							><a
+								href="https://www.npmjs.com/package/masonry-blade"
+								rel="noreferrer"
+								target="_blank"
+								>masonry-blade</a
+							></code
+						>, featuring virtualization and reactivity
 					</p>
 
 					<div class="hero__actions">
 						<a
 							class="hero__button hero__button--primary"
-							:href="NPM_URL"
+							href="https://www.npmjs.com/package/vue-masonry-blade"
 							target="_blank"
 							rel="noreferrer"
 						>
 							View on NPM
+						</a>
+						<a
+							class="hero__button hero__button--primary"
+							href="https://github.com/steelWinds/vue-masonry-blade"
+							target="_blank"
+							rel="noreferrer"
+						>
+							View on GitHub
 						</a>
 					</div>
 
@@ -182,7 +198,7 @@ onMounted(async () => {
 						<img
 							class="hero__logo"
 							:src="LOGO_SRC"
-							alt="masonry-vue-blade logo"
+							alt="vue-masonry-blade logo"
 						/>
 					</div>
 				</div>
@@ -192,10 +208,6 @@ onMounted(async () => {
 				<div class="gallery-section__header">
 					<div>
 						<h2 class="gallery-section__title">Scroll Area</h2>
-						<p class="gallery-section__subtitle">
-							The counter above shows how many cards are actually mounted inside
-							the DynamicMatrix root right now.
-						</p>
 					</div>
 
 					<button

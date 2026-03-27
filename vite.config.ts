@@ -1,7 +1,6 @@
 /// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
-import { playwright } from '@vitest/browser-playwright';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
@@ -9,15 +8,12 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			src: fileURLToPath(new URL('./src', import.meta.url)),
+			tests: fileURLToPath(new URL('./tests', import.meta.url)),
 		},
 	},
 	root: './playground',
 	test: {
-		browser: {
-			enabled: true,
-			headless: true,
-			instances: [{ browser: 'chromium' }],
-			provider: playwright(),
-		},
+		environment: 'jsdom',
+		root: '.',
 	},
 });
