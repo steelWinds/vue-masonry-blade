@@ -1,4 +1,4 @@
-name: masonry-blade codeql config
+name: vue-masonry-blade codeql config
 
 paths:
   - src

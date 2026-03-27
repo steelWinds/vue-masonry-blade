@@ -28,11 +28,11 @@ export const usePicsumImages = (pageSize = DEFAULT_PAGE_SIZE) => {
 	const pending = shallowRef(false);
 	const error = shallowRef<Error | null>(null);
 	const hasMore = shallowRef(true);
+	const buffer = shallowRef<ImageItem[]>([]);
 
 	let nextPage = 1;
 	let requestId = 0;
 	let controller: AbortController | null = null;
-	let buffer: ImageItem[] = [];
 	let seenIds = new Set<string>();
 
 	const normalizedPageSize =
@@ -66,7 +66,7 @@ export const usePicsumImages = (pageSize = DEFAULT_PAGE_SIZE) => {
 
 	const resetPagination = () => {
 		nextPage = 1;
-		buffer = [];
+		buffer.value = [];
 		seenIds = new Set<string>();
 		hasMore.value = true;
 	};
@@ -76,7 +76,7 @@ export const usePicsumImages = (pageSize = DEFAULT_PAGE_SIZE) => {
 		controller = null;
 	};
 
-	const takeFromBuffer = (count: number) => buffer.splice(0, count);
+	const takeFromBuffer = (count: number) => buffer.value.splice(0, count);
 
 	const fetchPage = async (page: number, signal: AbortSignal) => {
 		const response = await fetch(
@@ -105,7 +105,7 @@ export const usePicsumImages = (pageSize = DEFAULT_PAGE_SIZE) => {
 	};
 
 	const ensureBuffer = async (count: number, signal: AbortSignal) => {
-		while (buffer.length < count && hasMore.value) {
+		while (buffer.value.length < count && hasMore.value) {
 			const pageItems = await fetchPage(nextPage, signal);
 
 			if (!pageItems.length) {
@@ -126,7 +126,7 @@ export const usePicsumImages = (pageSize = DEFAULT_PAGE_SIZE) => {
 				return true;
 			});
 
-			buffer.push(...freshItems);
+			buffer.value = [...buffer.value, ...freshItems];
 
 			if (pageItems.length < normalizedPageSize) {
 				hasMore.value = false;
@@ -187,6 +187,7 @@ export const usePicsumImages = (pageSize = DEFAULT_PAGE_SIZE) => {
 	});
 
 	return {
+		buffer,
 		cancel,
 		error,
 		fetchImages,
