@@ -13,7 +13,7 @@ import { type MaybeRef, computed, shallowRef, unref } from 'vue';
 
 export type Breakpoints = Readonly<Record<number, number>>;
 
-export const useMasonryMatrix = <Meta = undefined>(
+export const useMasonryMatrix = <Meta = unknown>(
 	rootRef: MaybeComputedElementRef,
 	gap: MaybeRef<number>,
 	columnCount: MaybeRef<number>,

@@ -13,20 +13,20 @@
   <img align="right" width="150" height="150" src="https://raw.githubusercontent.com/steelWinds/vue-masonry-blade/main/.github/logo.webp" alt="masonry-blade logo">
 </p>
 
-A set of Vue 3 composable hooks for `masonry-blade`.
+Набор composable-хуков Vue 3 для `masonry-blade`.
 
-[Russian README](./README.ru.md)
+[English README](./README.md)
 
 <br>
 <br>
 <br>
 <br>
 
-## Quick Start
+## Быстрый старт
 
-### Installation
+### Установка
 
-Requires `vue@^3.5.0`.
+Требуется `vue@^3.5.0`.
 
 ```bash
 npm install vue-masonry-blade
@@ -40,7 +40,7 @@ pnpm add vue-masonry-blade
 yarn add vue-masonry-blade
 ```
 
-### Exports
+### Экспорты
 
 ```ts
 import {
@@ -51,10 +51,10 @@ import {
 } from 'vue-masonry-blade';
 ```
 
-### Basic example
+### Базовый пример
 
-`useMasonry()` combines `useMasonryMatrix()` and
-virtualization from `useVirtualMasonry()`.
+`useMasonry()` объединяет `useMasonryMatrix()` и
+виртуализацию из `useVirtualMasonry()`.
 
 ```ts
 <script setup lang="ts">
@@ -104,14 +104,15 @@ onMounted(async () => {
 </template>
 ```
 
-> For pagination or infinite loading, use `append(items)` instead of fully rebuilding the source array.
+> Для пагинации или бесконечной подгрузки используйте `append(items)` вместо полной пересборки исходного массива.
 
 ### Nuxt / SSR
 
-`useMasonry()` and `useVirtualMasonry()` depend on DOM measurements, so in SSR
-environments the subtree that uses them should be client-only.
-In Nuxt, wrap that part with `ClientOnly`, or move the hook usage into a
-client-only component.
+`useMasonry()` и `useVirtualMasonry()` зависят от DOM-измерений, поэтому в
+SSR-среде поддерево, которое использует эти хуки, должно рендериться только на
+клиенте.
+В Nuxt оборачивайте такую часть в `ClientOnly` или выносите использование
+хуков в client-only компонент.
 
 ```ts
 <ClientOnly>
@@ -123,8 +124,8 @@ client-only component.
 
 #### `useMasonry()`
 
-A convenient orchestration hook that connects `useMasonryMatrix()` and
-`useVirtualMasonry()` into one interface.
+Удобный orchestration-хук, который связывает `useMasonryMatrix()` и
+`useVirtualMasonry()` в один интерфейс.
 
 ```ts
 const {
@@ -155,9 +156,9 @@ const {
 
 #### `useMasonryMatrix()`
 
-Creates and manages a `MasonryMatrix` instance.
-Suitable when you need direct control over append, recreate, sorting,
-breakpoints, and worker state.
+Создаёт и управляет экземпляром `MasonryMatrix`.
+Подходит, когда нужен прямой контроль над append, recreate, sorting,
+breakpoints и состоянием worker'а.
 
 ```ts
 const {
@@ -176,12 +177,12 @@ const {
 } = useMasonryMatrix(rootRef, gap, columnCount, breakpoints);
 ```
 
-> The hook keeps the matrix state synchronized with the container width and recreates the matrix when the width, `gap`, number of columns, or breakpoints change.
+> Хук держит состояние матрицы синхронизированным с шириной контейнера и пересоздаёт ее при изменении ширины, `gap`, числа колонок или breakpoints.
 
 #### `useVirtualMasonry()`
 
-Builds the visible part of the matrix and returns a flat sorted list for
-rendering.
+Строит видимую часть матрицы и возвращает плоский отсортированный список для
+рендера.
 
 ```ts
 const { visibleMatrix, visibleItems, rangeStart, rangeEnd, overscanPx } =
@@ -190,20 +191,20 @@ const { visibleMatrix, visibleItems, rangeStart, rangeEnd, overscanPx } =
 	});
 ```
 
-- `visibleMatrix` preserves the column structure.
-- `visibleItems` is a sorted flat array of visible elements
+- `visibleMatrix` сохраняет структуру по колонкам.
+- `visibleItems` — отсортированный плоский массив видимых элементов
 
-### Utilities
+### Утилиты
 
 #### `getPositionedStyle()`
 
-Converts a computed matrix item into inline styles.
+Преобразует вычисленный элемент матрицы в inline-стили.
 
 ```ts
 const style = getPositionedStyle(item);
 ```
 
-Returned shape:
+Возвращаемая форма:
 
 ```ts
 {
@@ -213,10 +214,10 @@ Returned shape:
 }
 ```
 
-### Source item shape
+### Форма исходного элемента
 
-Items passed to `recreate(items)` or `append(items)` must have
-this shape:
+Элементы, передаваемые в `recreate(items)` или `append(items)`, должны иметь
+такой вид:
 
 ```ts
 {
@@ -227,21 +228,21 @@ this shape:
 }
 ```
 
-> `width` and `height` are the original dimensions used to calculate the final item size inside the grid.
+> `width` и `height` — это исходные размеры, которые используются для расчёта финального размера элемента внутри сетки.
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md)
+Смотрите [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## Security
 
-See [SECURITY.md](./SECURITY.md)
+Смотрите [SECURITY.md](./SECURITY.md)
 
 ## License
 
-The project is distributed under the MPL 2.0 license.
+Проект распространяется по лицензии MPL 2.0.
 
-## Links
+## Ссылки
 
 - Author: [@steelWinds](https://github.com/steelWinds)
 - Issues: [Open an issue](https://github.com/steelWinds/vue-masonry-blade/issues)

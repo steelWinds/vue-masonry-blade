@@ -19,7 +19,7 @@ export interface UseVirtualMasonryOptions {
 	overscanPx?: MaybeRef<number | undefined>;
 }
 
-export const lowerBoundByBottom = <Meta = undefined>(
+export const lowerBoundByBottom = <Meta = unknown>(
 	items: readonly Readonly<MatrixComputedUnit<Meta>>[],
 	target: number,
 ): number => {
@@ -41,7 +41,7 @@ export const lowerBoundByBottom = <Meta = undefined>(
 	return left;
 };
 
-export const useVirtualMasonry = <Meta = undefined>(
+export const useVirtualMasonry = <Meta = unknown>(
 	rootRef: MaybeRefOrGetter,
 	matrix: Ref<MasonryMatrix<Meta> | null>,
 	matrixColumns: Ref<ReadonlyMatrix<Meta>>,
