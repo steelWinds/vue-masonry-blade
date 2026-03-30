@@ -56,7 +56,7 @@ import {
 `useMasonry()` combines `useMasonryMatrix()` and
 virtualization from `useVirtualMasonry()`.
 
-```ts
+```vue
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { getPositionedStyle, useMasonry } from 'vue-masonry-blade';
@@ -113,7 +113,7 @@ environments the subtree that uses them should be client-only.
 In Nuxt, wrap that part with `ClientOnly`, or move the hook usage into a
 client-only component.
 
-```ts
+```vue
 <ClientOnly>
 	<MasonryGallery />
 </ClientOnly>

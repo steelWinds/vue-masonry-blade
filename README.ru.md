@@ -56,7 +56,7 @@ import {
 `useMasonry()` объединяет `useMasonryMatrix()` и
 виртуализацию из `useVirtualMasonry()`.
 
-```ts
+```vue
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { getPositionedStyle, useMasonry } from 'vue-masonry-blade';
@@ -114,7 +114,7 @@ SSR-среде поддерево, которое использует эти х
 В Nuxt оборачивайте такую часть в `ClientOnly` или выносите использование
 хуков в client-only компонент.
 
-```ts
+```vue
 <ClientOnly>
 	<MasonryGallery />
 </ClientOnly>
