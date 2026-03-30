@@ -2,25 +2,19 @@ import {
 	MasonryMatrix,
 	type MatrixSourceUnit,
 	type ReadonlyMatrix,
-	type ReadonlySortItems,
 } from 'masonry-blade';
 import {
-	type MaybeRef,
-	type TemplateRef,
-	computed,
-	shallowRef,
-	unref,
-} from 'vue';
-import {
+	type MaybeComputedElementRef,
 	tryOnBeforeUnmount,
 	useElementSize,
 	watchDebounced,
 } from '@vueuse/core';
+import { type MaybeRef, computed, shallowRef, unref } from 'vue';
 
 export type Breakpoints = Readonly<Record<number, number>>;
 
 export const useMasonryMatrix = <Meta = undefined>(
-	rootRef: TemplateRef,
+	rootRef: MaybeComputedElementRef,
 	gap: MaybeRef<number>,
 	columnCount: MaybeRef<number>,
 	breakpoints?: MaybeRef<Breakpoints | undefined>,
@@ -33,6 +27,8 @@ export const useMasonryMatrix = <Meta = undefined>(
 	const containerHeight = shallowRef(0);
 
 	const { width } = useElementSize(rootRef);
+
+	let operationQueue = Promise.resolve();
 
 	const normalizedBreakpoints = computed(() =>
 		Object.entries(unref(breakpoints) ?? {})
@@ -56,9 +52,7 @@ export const useMasonryMatrix = <Meta = undefined>(
 		() => width.value > 0 && resolvedColumnCount.value > 0,
 	);
 
-	let operationQueue: Promise<unknown> = Promise.resolve();
-
-	const runExclusive = <T>(task: () => Promise<T>): Promise<T> => {
+	const runExclusive = <T>(task: () => Promise<T>) => {
 		const nextTask = operationQueue.then(task, task);
 
 		operationQueue = nextTask.then(
@@ -69,7 +63,7 @@ export const useMasonryMatrix = <Meta = undefined>(
 		return nextTask;
 	};
 
-	const ensureMatrix = (): MasonryMatrix<Meta> | null => {
+	const ensureMatrix = () => {
 		if (!isLayoutReady.value) {
 			return null;
 		}
@@ -87,11 +81,12 @@ export const useMasonryMatrix = <Meta = undefined>(
 
 	const recreate = async (
 		items: readonly Readonly<MatrixSourceUnit<Meta>>[] = sourceItems.value,
-	): Promise<ReadonlyMatrix<Meta>> => {
+	) => {
 		sourceItems.value = items;
 
 		if (!isLayoutReady.value) {
 			matrixColumns.value = [];
+
 			return matrixColumns.value;
 		}
 
@@ -121,10 +116,7 @@ export const useMasonryMatrix = <Meta = undefined>(
 			return columns;
 		});
 	};
-
-	const append = async (
-		items: readonly Readonly<MatrixSourceUnit<Meta>>[],
-	): Promise<ReadonlyMatrix<Meta>> => {
+	const append = async (items: readonly Readonly<MatrixSourceUnit<Meta>>[]) => {
 		if (!items.length) {
 			return matrixColumns.value;
 		}
@@ -154,10 +146,7 @@ export const useMasonryMatrix = <Meta = undefined>(
 			return columns;
 		});
 	};
-
-	const sort = async (
-		source: ReadonlyMatrix<Meta> = matrixColumns.value,
-	): Promise<ReadonlySortItems<Meta>> => {
+	const sort = async (source: ReadonlyMatrix<Meta> = matrixColumns.value) => {
 		if (!matrix.value || !source.length) {
 			return [];
 		}
@@ -166,11 +155,8 @@ export const useMasonryMatrix = <Meta = undefined>(
 	};
 
 	const clear = () => recreate([]);
-
 	const terminateWorker = () => matrix.value?.terminateWorker();
-
 	const disableWorker = () => matrix.value?.disableWorker();
-
 	const enableWorker = () => matrix.value?.enableWorker();
 
 	watchDebounced(

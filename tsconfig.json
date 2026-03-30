@@ -26,5 +26,5 @@
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedSideEffectImports": false
 	},
-	"include": ["src", "playground"]
+	"include": ["src", "playground", "tests"]
 }
