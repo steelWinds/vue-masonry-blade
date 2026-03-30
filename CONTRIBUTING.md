@@ -100,7 +100,6 @@ If you change behavior, add or update tests.
 If a change improves performance, include at least one of the following:
 
 - a reproducible measurement
-- a benchmark run or benchmark-suite change when relevant
 - a short explanation of the trade-off
 
 Do not trade away readability or API clarity for tiny gains unless the benefit is clear.
