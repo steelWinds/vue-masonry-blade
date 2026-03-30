@@ -1,6 +1,6 @@
 {
 	"name": "vue-masonry-blade",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"private": false,
 	"description": "A component written as an implementation of the masonry-blade library",
 	"keywords": [
