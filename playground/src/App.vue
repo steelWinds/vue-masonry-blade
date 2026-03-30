@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import './playground.css';
 import { computed, onMounted, ref } from 'vue';
-import { getPositionedStyle, useMasonry } from 'src/index';
+import { getPositionedStyle, useMasonry } from '../../build';
 // @ts-expect-error
 import LOGO_SRC from './logo.png?url';
 import type { MatrixComputedUnit } from 'masonry-blade';
