@@ -13,20 +13,20 @@
   <img align="right" width="150" height="150" src="https://raw.githubusercontent.com/steelWinds/vue-masonry-blade/main/.github/logo.webp" alt="masonry-blade logo">
 </p>
 
-Набор composable-хуков Vue 3 для `masonry-blade`.
+A set of Vue 3 composable hooks for `masonry-blade`.
 
-[English README](./README.md)
+[Russian README](./README.ru.md)
 
 <br>
 <br>
 <br>
 <br>
 
-## Быстрый старт
+## Quick Start
 
-### Установка
+### Installation
 
-Требуется `vue@^3.5.0`.
+Requires `vue@^3.5.0`.
 
 ```bash
 npm install vue-masonry-blade
@@ -40,7 +40,7 @@ pnpm add vue-masonry-blade
 yarn add vue-masonry-blade
 ```
 
-### Экспорты
+### Exports
 
 ```ts
 import {
@@ -51,10 +51,10 @@ import {
 } from 'vue-masonry-blade';
 ```
 
-### Базовый пример
+### Basic example
 
-`useMasonry()` объединяет `useMasonryMatrix()` и
-виртуализацию из `useVirtualMasonry()`.
+`useMasonry()` combines `useMasonryMatrix()` and
+virtualization from `useVirtualMasonry()`.
 
 ```ts
 <script setup lang="ts">
@@ -104,14 +104,14 @@ onMounted(async () => {
 </template>
 ```
 
-> Для пагинации или бесконечной подгрузки используйте `append(items)` вместо полной пересборки исходного массива.
+> For pagination or infinite loading, use `append(items)` instead of fully rebuilding the source array.
 
 ### Composables
 
 #### `useMasonry()`
 
-Удобный orchestration-хук, который связывает `useMasonryMatrix()` и
-`useVirtualMasonry()` в один интерфейс.
+A convenient orchestration hook that connects `useMasonryMatrix()` and
+`useVirtualMasonry()` into one interface.
 
 ```ts
 const {
@@ -142,9 +142,9 @@ const {
 
 #### `useMasonryMatrix()`
 
-Создаёт и управляет экземпляром `MasonryMatrix`.
-Подходит, когда нужен прямой контроль над append, recreate, sorting,
-breakpoints и состоянием worker'а.
+Creates and manages a `MasonryMatrix` instance.
+Suitable when you need direct control over append, recreate, sorting,
+breakpoints, and worker state.
 
 ```ts
 const {
@@ -163,12 +163,12 @@ const {
 } = useMasonryMatrix(rootRef, gap, columnCount, breakpoints);
 ```
 
-> Хук держит состояние матрицы синхронизированным с шириной контейнера и пересоздаёт ее при изменении ширины, `gap`, числа колонок или breakpoints.
+> The hook keeps the matrix state synchronized with the container width and recreates the matrix when the width, `gap`, number of columns, or breakpoints change.
 
 #### `useVirtualMasonry()`
 
-Строит видимую часть матрицы и возвращает плоский отсортированный список для
-рендера.
+Builds the visible part of the matrix and returns a flat sorted list for
+rendering.
 
 ```ts
 const { visibleMatrix, visibleItems, rangeStart, rangeEnd, overscanPx } =
@@ -177,20 +177,20 @@ const { visibleMatrix, visibleItems, rangeStart, rangeEnd, overscanPx } =
 	});
 ```
 
-- `visibleMatrix` сохраняет структуру по колонкам.
-- `visibleItems` — отсортированный плоский массив видимых элементов
+- `visibleMatrix` preserves the column structure.
+- `visibleItems` is a sorted flat array of visible elements
 
-### Утилиты
+### Utilities
 
 #### `getPositionedStyle()`
 
-Преобразует вычисленный элемент матрицы в inline-стили.
+Converts a computed matrix item into inline styles.
 
 ```ts
 const style = getPositionedStyle(item);
 ```
 
-Возвращаемая форма:
+Returned shape:
 
 ```ts
 {
@@ -200,10 +200,10 @@ const style = getPositionedStyle(item);
 }
 ```
 
-### Форма исходного элемента
+### Source item shape
 
-Элементы, передаваемые в `recreate(items)` или `append(items)`, должны иметь
-такой вид:
+Items passed to `recreate(items)` or `append(items)` must have
+this shape:
 
 ```ts
 {
@@ -214,21 +214,21 @@ const style = getPositionedStyle(item);
 }
 ```
 
-> `width` и `height` — это исходные размеры, которые используются для расчёта финального размера элемента внутри сетки.
+> `width` and `height` are the original dimensions used to calculate the final item size inside the grid.
 
 ## Contributing
 
-Смотрите [CONTRIBUTING.md](./CONTRIBUTING.md)
+See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## Security
 
-Смотрите [SECURITY.md](./SECURITY.md)
+See [SECURITY.md](./SECURITY.md)
 
 ## License
 
-Проект распространяется по лицензии MPL 2.0.
+The project is distributed under the MPL 2.0 license.
 
-## Ссылки
+## Links
 
 - Author: [@steelWinds](https://github.com/steelWinds)
 - Issues: [Open an issue](https://github.com/steelWinds/vue-masonry-blade/issues)
