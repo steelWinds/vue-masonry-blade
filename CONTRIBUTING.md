@@ -2,7 +2,8 @@
 
 Thanks for your interest in contributing to `vue-masonry-blade`.
 
-A wrapper for `masonry-blade`, **featuring virtualization and reactivity.**
+Composable hooks for `masonry-blade`, **featuring virtualization and
+reactivity.**
 
 ## Before opening an issue or pull request
 
@@ -19,7 +20,7 @@ For security issues, please do not open a public issue. See `SECURITY.md`.
 
 ### Requirements
 
-- Node.js `>=22.22.2`
+- Node.js `>=22.22.0`
 - `pnpm`
 
 ### Install
@@ -54,13 +55,13 @@ This library is intentionally narrow.
 
 It is:
 
-- A masonry layout engine
-- Focused on source sizes, coordinates, and explicit rebuild inputs
+- A low-level masonry layout and virtualization toolkit for Vue
+- Focused on source sizes, coordinates, visible ranges, and explicit rebuild inputs
 
 It is not:
 
 - An image loader
-- A virtualization library
+- A render component library
 
 If you want to propose a broader feature, please open an issue first and explain the use case.
 

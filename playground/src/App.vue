@@ -1,19 +1,10 @@
 <script setup lang="ts">
 import './playground.css';
-import {
-	type ComponentPublicInstance,
-	computed,
-	nextTick,
-	onMounted,
-	ref,
-	useTemplateRef,
-	watch,
-} from 'vue';
-import { DynamicMatrix } from 'src/index';
+import { computed, onMounted, ref } from 'vue';
+import { getPositionedStyle, useMasonry } from 'src/index';
 // @ts-expect-error
 import LOGO_SRC from './logo.png?url';
 import type { MatrixComputedUnit } from 'masonry-blade';
-import { useMutationObserver } from '@vueuse/core';
 import { usePicsumImages } from '../helpers/usePicsumImages';
 
 type DemoMeta = {
@@ -21,32 +12,28 @@ type DemoMeta = {
 	author?: string;
 };
 
-type DynamicMatrixPublicInstance = ComponentPublicInstance & {
-	$el: HTMLElement;
-	append?: (items: readonly unknown[]) => Promise<void> | void;
-};
-
-const masonryRef = useTemplateRef<DynamicMatrixPublicInstance>('masonry');
-
-const { fetchImages, buffer } = usePicsumImages();
+const masonryRef = ref<HTMLElement | null>(null);
+const { fetchImages } = usePicsumImages();
 
 const MIN_COLUMNS = 1;
 const MAX_COLUMNS = 12;
 const INITIAL_COLUMNS = 4;
+const DEFAULT_GAP = 14;
+const DEFAULT_OVERSCAN_PX = 300;
 
 const columnCount = ref<number>(INITIAL_COLUMNS);
+const gap = ref<number>(DEFAULT_GAP);
+const overscanPx = ref<number>(DEFAULT_OVERSCAN_PX);
 const isLoading = ref(false);
-const renderedDomItemsSource = ref(0);
 
-const masonryEl = computed<HTMLElement | null>(
-	() => masonryRef.value?.$el ?? null,
-);
-const renderedDomItemsCount = computed(() => renderedDomItemsSource.value);
+const { append, containerHeight, recreate, visibleItems } =
+	useMasonry<DemoMeta>(masonryRef, {
+		columnCount,
+		gap,
+		overscanPx,
+	});
 
-const syncRenderedDomItemsCount = (): void => {
-	renderedDomItemsSource.value =
-		masonryEl.value?.querySelectorAll('[data-masonry-card]').length ?? 0;
-};
+const renderedDomItemsCount = computed(() => visibleItems.value.length);
 
 const handleColumnCountInput = (event: Event): void => {
 	const target = event.target as HTMLInputElement;
@@ -57,7 +44,7 @@ const handleColumnCountInput = (event: Event): void => {
 		: INITIAL_COLUMNS;
 };
 
-const append = async (mode: 'replace' | 'pagination'): Promise<void> => {
+const loadImages = async (mode: 'replace' | 'pagination'): Promise<void> => {
 	if (isLoading.value) {
 		return;
 	}
@@ -66,10 +53,12 @@ const append = async (mode: 'replace' | 'pagination'): Promise<void> => {
 
 	try {
 		const images = await fetchImages(32, mode);
-		await masonryRef.value?.append?.(images as readonly unknown[]);
 
-		await nextTick();
-		syncRenderedDomItemsCount();
+		if (mode === 'replace') {
+			await recreate(images);
+		} else {
+			await append(images);
+		}
 	} finally {
 		isLoading.value = false;
 	}
@@ -78,32 +67,8 @@ const append = async (mode: 'replace' | 'pagination'): Promise<void> => {
 const buildSrcURL = (item: MatrixComputedUnit<DemoMeta>): string =>
 	`${item.meta?.src}/${Math.round(item.width)}/${Math.round(item.height)}`;
 
-useMutationObserver(
-	masonryEl,
-	async () => {
-		await nextTick();
-		syncRenderedDomItemsCount();
-	},
-	{
-		childList: true,
-		subtree: true,
-	},
-);
-
-watch(
-	[masonryEl, () => buffer.value.length, columnCount],
-	async () => {
-		await nextTick();
-
-		syncRenderedDomItemsCount();
-	},
-	{ flush: 'post' },
-);
-
 onMounted(async () => {
-	await append('replace');
-	await nextTick();
-	syncRenderedDomItemsCount();
+	await loadImages('replace');
 });
 </script>
 
@@ -123,7 +88,7 @@ onMounted(async () => {
 					<h1 class="hero__title">vue-masonry-blade</h1>
 
 					<p class="hero__description">
-						A wrapper for
+						Composable masonry and virtualization hooks powered by
 						<code style="text-decoration: underline"
 							><a
 								href="https://www.npmjs.com/package/masonry-blade"
@@ -131,7 +96,7 @@ onMounted(async () => {
 								target="_blank"
 								>masonry-blade</a
 							></code
-						>, featuring virtualization and reactivity
+						>
 					</p>
 
 					<div class="hero__actions">
@@ -214,39 +179,42 @@ onMounted(async () => {
 						class="gallery-section__action"
 						type="button"
 						:disabled="isLoading"
-						@click="append('pagination')"
+						@click="loadImages('pagination')"
 					>
 						{{ isLoading ? 'Loading...' : 'Load more' }}
 					</button>
 				</div>
 
 				<div class="gallery-frame">
-					<DynamicMatrix
-						ref="masonry"
+					<div
+						ref="masonryRef"
 						class="masonry"
-						:column-count="columnCount"
-						:items="buffer"
+						:style="{ height: `${containerHeight}px` }"
 					>
-						<template #default="{ item, positionedStyle }">
-							<article :style="positionedStyle" class="card" data-masonry-card>
-								<div class="card__meta">
-									<span class="card__badge">#{{ item.id }}</span>
+						<article
+							v-for="item in visibleItems"
+							:key="item.id"
+							:style="getPositionedStyle(item)"
+							class="card"
+							data-masonry-card
+						>
+							<div class="card__meta">
+								<span class="card__badge">#{{ item.id }}</span>
 
-									<span class="card__badge">
-										{{ item.meta?.author ?? 'Unknown author' }}
-									</span>
-								</div>
+								<span class="card__badge">
+									{{ item.meta?.author ?? 'Unknown author' }}
+								</span>
+							</div>
 
-								<img
-									class="card__image"
-									:src="buildSrcURL(item)"
-									:alt="item.meta?.author ?? `Image ${item.id}`"
-									loading="lazy"
-									decoding="async"
-								/>
-							</article>
-						</template>
-					</DynamicMatrix>
+							<img
+								class="card__image"
+								:src="buildSrcURL(item)"
+								:alt="item.meta?.author ?? `Image ${item.id}`"
+								loading="lazy"
+								decoding="async"
+							/>
+						</article>
+					</div>
 				</div>
 			</main>
 		</div>
