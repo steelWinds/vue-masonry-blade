@@ -2,7 +2,6 @@ import {
 	MasonryMatrix,
 	type MatrixSourceUnit,
 	type ReadonlyMatrix,
-	type ReadonlySortItems,
 } from 'masonry-blade';
 import {
 	type MaybeComputedElementRef,
@@ -26,9 +25,10 @@ export const useMasonryMatrix = <Meta = undefined>(
 		[],
 	);
 	const containerHeight = shallowRef(0);
+
 	const { width } = useElementSize(rootRef);
 
-	let operationQueue: Promise<unknown> = Promise.resolve();
+	let operationQueue = Promise.resolve();
 
 	const normalizedBreakpoints = computed(() =>
 		Object.entries(unref(breakpoints) ?? {})
@@ -39,6 +39,7 @@ export const useMasonryMatrix = <Meta = undefined>(
 			)
 			.sort((a, b) => a[0] - b[0]),
 	);
+
 	const resolvedColumnCount = computed(() =>
 		normalizedBreakpoints.value.reduce(
 			(columns, [minWidth, breakpointColumns]) =>
@@ -46,11 +47,12 @@ export const useMasonryMatrix = <Meta = undefined>(
 			unref(columnCount),
 		),
 	);
+
 	const isLayoutReady = computed(
 		() => width.value > 0 && resolvedColumnCount.value > 0,
 	);
 
-	const runExclusive = <T>(task: () => Promise<T>): Promise<T> => {
+	const runExclusive = <T>(task: () => Promise<T>) => {
 		const nextTask = operationQueue.then(task, task);
 
 		operationQueue = nextTask.then(
@@ -60,7 +62,8 @@ export const useMasonryMatrix = <Meta = undefined>(
 
 		return nextTask;
 	};
-	const ensureMatrix = (): MasonryMatrix<Meta> | null => {
+
+	const ensureMatrix = () => {
 		if (!isLayoutReady.value) {
 			return null;
 		}
@@ -75,9 +78,10 @@ export const useMasonryMatrix = <Meta = undefined>(
 
 		return matrix.value;
 	};
+
 	const recreate = async (
 		items: readonly Readonly<MatrixSourceUnit<Meta>>[] = sourceItems.value,
-	): Promise<ReadonlyMatrix<Meta>> => {
+	) => {
 		sourceItems.value = items;
 
 		if (!isLayoutReady.value) {
@@ -112,9 +116,7 @@ export const useMasonryMatrix = <Meta = undefined>(
 			return columns;
 		});
 	};
-	const append = async (
-		items: readonly Readonly<MatrixSourceUnit<Meta>>[],
-	): Promise<ReadonlyMatrix<Meta>> => {
+	const append = async (items: readonly Readonly<MatrixSourceUnit<Meta>>[]) => {
 		if (!items.length) {
 			return matrixColumns.value;
 		}
@@ -144,9 +146,7 @@ export const useMasonryMatrix = <Meta = undefined>(
 			return columns;
 		});
 	};
-	const sort = async (
-		source: ReadonlyMatrix<Meta> = matrixColumns.value,
-	): Promise<ReadonlySortItems<Meta>> => {
+	const sort = async (source: ReadonlyMatrix<Meta> = matrixColumns.value) => {
 		if (!matrix.value || !source.length) {
 			return [];
 		}

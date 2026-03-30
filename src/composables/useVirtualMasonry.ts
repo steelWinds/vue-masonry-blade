@@ -74,7 +74,7 @@ export const useVirtualMasonry = <Meta = undefined>(
 		),
 	);
 
-	const visibleMatrix = computed<ReadonlyMatrix<Meta>>(() =>
+	const visibleMatrix = computed(() =>
 		matrixColumns.value.map((column) => {
 			const startIndex = lowerBoundByBottom(column, rangeStart.value);
 			let endIndex = startIndex;
@@ -99,7 +99,7 @@ export const useVirtualMasonry = <Meta = undefined>(
 	let rerunRequested = false;
 	let latestRunId = 0;
 
-	const updateVisibleItems = async (runId: number): Promise<void> => {
+	const updateVisibleItems = async (runId: number) => {
 		const currentMatrix = matrix.value;
 		const currentVisibleMatrix = visibleMatrix.value;
 		const hasItems = currentVisibleMatrix.some((column) => column.length > 0);
@@ -123,7 +123,7 @@ export const useVirtualMasonry = <Meta = undefined>(
 		} catch {}
 	};
 
-	const scheduleSort = async (): Promise<void> => {
+	const scheduleSort = async () => {
 		latestRunId += 1;
 
 		if (activeSort) {

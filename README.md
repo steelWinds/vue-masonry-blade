@@ -13,7 +13,7 @@
   <img align="right" width="150" height="150" src="./.github/logo.webp" alt="masonry-blade logo">
 </p>
 
-A wrapper for `vue-masonry-blade`, **featuring virtualization and reactivity.**
+A wrapper for `masonry-blade`, **featuring virtualization and reactivity.**
 
 <br>
 <br>
