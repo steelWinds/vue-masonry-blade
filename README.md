@@ -106,6 +106,19 @@ onMounted(async () => {
 
 > For pagination or infinite loading, use `append(items)` instead of fully rebuilding the source array.
 
+### Nuxt / SSR
+
+`useMasonry()` and `useVirtualMasonry()` depend on DOM measurements, so in SSR
+environments the subtree that uses them should be client-only.
+In Nuxt, wrap that part with `ClientOnly`, or move the hook usage into a
+client-only component.
+
+```ts
+<ClientOnly>
+	<MasonryGallery />
+</ClientOnly>
+```
+
 ### Composables
 
 #### `useMasonry()`

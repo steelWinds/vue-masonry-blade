@@ -106,6 +106,20 @@ onMounted(async () => {
 
 > Для пагинации или бесконечной подгрузки используйте `append(items)` вместо полной пересборки исходного массива.
 
+### Nuxt / SSR
+
+`useMasonry()` и `useVirtualMasonry()` зависят от DOM-измерений, поэтому в
+SSR-среде поддерево, которое использует эти хуки, должно рендериться только на
+клиенте.
+В Nuxt оборачивайте такую часть в `ClientOnly` или выносите использование
+хуков в client-only компонент.
+
+```ts
+<ClientOnly>
+	<MasonryGallery />
+</ClientOnly>
+```
+
 ### Composables
 
 #### `useMasonry()`
