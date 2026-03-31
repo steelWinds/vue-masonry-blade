@@ -1,6 +1,6 @@
 {
 	"name": "vue-masonry-blade",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"private": false,
 	"description": "Composable masonry and virtualization hooks powered by masonry-blade",
 	"keywords": [
