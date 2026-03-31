@@ -78,12 +78,16 @@ const gap = ref(12);
 const overscanPx = ref(300);
 const breakpoints = shallowRef({ 0: 1, 640: 2, 960: 3, 1280: 4 });
 
-const { containerHeight, recreate, visibleItems } = useMasonry<Meta>(rootRef, {
-	columnCount,
-	gap,
-	overscanPx,
-	breakpoints,
-});
+const { containerHeight, recreate, visibleItems, onCreated, disableWorker } =
+	useMasonry<Meta>(rootRef, {
+		columnCount,
+		gap,
+		overscanPx,
+		breakpoints,
+	});
+
+// For disable worker
+onCreated(disableWorker);
 
 onMounted(async () => {
 	await recreate(items.value);
