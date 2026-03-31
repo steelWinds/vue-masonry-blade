@@ -15,8 +15,8 @@ importers:
         specifier: ^14.2.1
         version: 14.2.1(vue@3.5.31(typescript@5.9.3))
       masonry-blade:
-        specifier: 2.0.2
-        version: 2.0.2
+        specifier: 2.0.3
+        version: 2.0.3
     devDependencies:
       '@arethetypeswrong/core':
         specifier: ^0.18.2
@@ -1159,8 +1159,8 @@ packages:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
     engines: {node: '>=10'}
 
-  masonry-blade@2.0.2:
-    resolution: {integrity: sha512-X53BBnm/wn7CuIOcu0pkLqtIk+6/SdeQ7fcUlzqniikpWKHjdrieSgJvg7NomT5xOSYyOqPxKvMD8+bejQQ17g==}
+  masonry-blade@2.0.3:
+    resolution: {integrity: sha512-qGNvxBWnRaB8wfnQpqTUwaCpdwu53Sp7+muenNKXYsfjYIWWfDrdW38rr74E8N+Nu26f6oO36kgUx29+U04g0A==}
     engines: {node: '>=22.22.2'}
 
   mdn-data@2.27.1:
@@ -2537,7 +2537,7 @@ snapshots:
     dependencies:
       semver: 7.7.4
 
-  masonry-blade@2.0.2: {}
+  masonry-blade@2.0.3: {}
 
   mdn-data@2.27.1: {}
 

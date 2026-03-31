@@ -55,7 +55,7 @@
 	},
 	"dependencies": {
 		"@vueuse/core": "^14.2.1",
-		"masonry-blade": "^2.0.2"
+		"masonry-blade": "2.0.3"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/core": "^0.18.2",
