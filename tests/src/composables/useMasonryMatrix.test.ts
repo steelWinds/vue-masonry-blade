@@ -289,6 +289,32 @@ describe('useMasonryMatrix', () => {
 			});
 		});
 
+		test('fires onCreated when the matrix instance is created for the first time', async () => {
+			const { columnCount, gap, hook } = mountHook({
+				columnCount: 3,
+				gap: 16,
+				width: 960,
+			});
+			const onCreated = vi.fn();
+
+			hook.onCreated(onCreated);
+
+			await flushDebounce();
+
+			const instance = getLastInstance();
+
+			expect(onCreated).toHaveBeenCalledTimes(1);
+			expect(onCreated).toHaveBeenCalledWith(instance);
+
+			mocks.width!.value = 1200;
+			columnCount.value = 4;
+			gap.value = 24;
+
+			await flushDebounce();
+
+			expect(onCreated).toHaveBeenCalledTimes(1);
+		});
+
 		test('resolves column count from normalized breakpoints', async () => {
 			const { breakpoints, columnCount, hook } = mountHook({
 				columnCount: 1,

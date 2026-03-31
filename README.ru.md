@@ -153,6 +153,7 @@ const {
 	recreate,
 	clear,
 	sort,
+	onCreated,
 	disableWorker,
 	enableWorker,
 	terminateWorker,
@@ -186,6 +187,7 @@ const {
 	recreate,
 	clear,
 	sort,
+	onCreated,
 	disableWorker,
 	enableWorker,
 	terminateWorker,
@@ -193,6 +195,8 @@ const {
 ```
 
 > Хук держит состояние матрицы синхронизированным с шириной контейнера и пересоздаёт ее при изменении ширины, `gap`, числа колонок или breakpoints.
+>
+> Через `onCreated((matrix) => {})` можно подписаться на первое создание внутреннего экземпляра `MasonryMatrix`.
 
 #### `useVirtualMasonry()`
 

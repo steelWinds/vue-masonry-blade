@@ -152,6 +152,7 @@ const {
 	recreate,
 	clear,
 	sort,
+	onCreated,
 	disableWorker,
 	enableWorker,
 	terminateWorker,
@@ -185,6 +186,7 @@ const {
 	recreate,
 	clear,
 	sort,
+	onCreated,
 	disableWorker,
 	enableWorker,
 	terminateWorker,
@@ -192,6 +194,8 @@ const {
 ```
 
 > The hook keeps the matrix state synchronized with the container width and recreates the matrix when the width, `gap`, number of columns, or breakpoints change.
+>
+> `onCreated((matrix) => {})` lets you subscribe to the first creation of the internal `MasonryMatrix` instance.
 
 #### `useVirtualMasonry()`
 

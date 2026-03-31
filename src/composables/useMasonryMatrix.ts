@@ -5,6 +5,7 @@ import {
 } from 'masonry-blade';
 import {
 	type MaybeComputedElementRef,
+	createEventHook,
 	tryOnBeforeUnmount,
 	useElementSize,
 	watchDebounced,
@@ -25,6 +26,7 @@ export const useMasonryMatrix = <Meta = unknown>(
 		[],
 	);
 	const containerHeight = shallowRef(0);
+	const createdHook = createEventHook<MasonryMatrix<Meta>>();
 
 	const { width } = useElementSize(rootRef);
 
@@ -74,6 +76,8 @@ export const useMasonryMatrix = <Meta = unknown>(
 				resolvedColumnCount.value,
 				unref(gap),
 			);
+
+			void createdHook.trigger(matrix.value);
 		}
 
 		return matrix.value;
@@ -191,6 +195,7 @@ export const useMasonryMatrix = <Meta = unknown>(
 		enableWorker,
 		matrix,
 		matrixColumns,
+		onCreated: createdHook.on,
 		recreate,
 		resolvedColumnCount,
 		sort,
