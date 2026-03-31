@@ -26,18 +26,18 @@ A set of Vue 3 composable hooks for `masonry-blade`.
 
 ### Installation
 
-Requires `vue@^3.5.0`, `@vueuse/core@^14.2.1`, `masonry-blade@^2.0.2`.
+Requires `vue@^3.5.0`.
 
 ```bash
-npm install vue-masonry-blade @vueuse/core masonry-blade
+npm install vue-masonry-blade
 ```
 
 ```bash
-pnpm add vue-masonry-blade @vueuse/core masonry-blade
+pnpm add vue-masonry-blade
 ```
 
 ```bash
-yarn add vue-masonry-blade @vueuse/core masonry-blade
+yarn add vue-masonry-blade
 ```
 
 ### Exports
