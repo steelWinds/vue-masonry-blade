@@ -26,18 +26,18 @@
 
 ### Установка
 
-Требуется `vue@^3.5.0`, `@vueuse/core@^14.2.1`, `masonry-blade@^2.0.2`.
+Требуется `vue@^3.5.0`.
 
 ```bash
-npm install vue-masonry-blade @vueuse/core masonry-blade
+npm install vue-masonry-blade
 ```
 
 ```bash
-pnpm add vue-masonry-blade @vueuse/core masonry-blade
+pnpm add vue-masonry-blade
 ```
 
 ```bash
-yarn add vue-masonry-blade @vueuse/core masonry-blade
+yarn add vue-masonry-blade
 ```
 
 ### Экспорты
@@ -58,22 +58,31 @@ import {
 
 ```vue
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, shallowRef } from 'vue';
 import { getPositionedStyle, useMasonry } from 'vue-masonry-blade';
+
+interface Meta {
+	src: string;
+}
 
 const rootRef = ref<HTMLElement | null>(null);
 
-const items = ref([
+const items = shallowRef([
 	{ id: 1, width: 800, height: 600, meta: { src: '/images/1.jpg' } },
 	{ id: 2, width: 800, height: 1100, meta: { src: '/images/2.jpg' } },
 	{ id: 3, width: 800, height: 700, meta: { src: '/images/3.jpg' } },
 ]);
 
-const { containerHeight, recreate, visibleItems } = useMasonry(rootRef, {
-	columnCount: 4,
-	gap: 12,
-	overscanPx: 300,
-	breakpoints: { 0: 1, 640: 2, 960: 3, 1280: 4 },
+const columnCount = ref(4);
+const gap = ref(12);
+const overscanPx = ref(300);
+const breakpoints = shallowRef({ 0: 1, 640: 2, 960: 3, 1280: 4 });
+
+const { containerHeight, recreate, visibleItems } = useMasonry<Meta>(rootRef, {
+	columnCount,
+	gap,
+	overscanPx,
+	breakpoints,
 });
 
 onMounted(async () => {
@@ -95,7 +104,7 @@ onMounted(async () => {
 			}"
 		>
 			<img
-				:src="item.meta.src"
+				:src="item.meta?.src"
 				:alt="''"
 				:style="{ width: '100%', height: '100%', objectFit: 'cover' }"
 			/>
@@ -105,6 +114,12 @@ onMounted(async () => {
 ```
 
 > Для пагинации или бесконечной подгрузки используйте `append(items)` вместо полной пересборки исходного массива.
+>
+> `items` здесь намеренно хранится в `shallowRef(...)`. Если использовать
+> `ref(...)` или `reactive(...)`, Vue обернет вложенные элементы в proxy, а
+> такие значения нельзя передать в worker через structured clone. Это правило
+> относится ко всем элементам, которые вы передаёте в `append()` /
+> `recreate()` или вообще храните в исходной коллекции матрицы.
 
 ### Nuxt / SSR
 
@@ -229,6 +244,11 @@ const style = getPositionedStyle(item);
 ```
 
 > `width` и `height` — это исходные размеры, которые используются для расчёта финального размера элемента внутри сетки.
+>
+> Храните исходную коллекцию в `shallowRef(...)` или иным способом следите,
+> чтобы элементы оставались plain-объектами, совместимыми со structured
+> clone. В worker-режиме Vue proxy из `ref(...)` / `reactive(...)` не
+> проходят structured clone и могут ломать `append()` / `recreate()`.
 
 ## Contributing
 

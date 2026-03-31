@@ -116,6 +116,7 @@ export const useMasonryMatrix = <Meta = unknown>(
 			return columns;
 		});
 	};
+
 	const append = async (items: readonly Readonly<MatrixSourceUnit<Meta>>[]) => {
 		if (!items.length) {
 			return matrixColumns.value;
@@ -146,6 +147,7 @@ export const useMasonryMatrix = <Meta = unknown>(
 			return columns;
 		});
 	};
+
 	const sort = async (source: ReadonlyMatrix<Meta> = matrixColumns.value) => {
 		if (!matrix.value || !source.length) {
 			return [];
@@ -160,7 +162,7 @@ export const useMasonryMatrix = <Meta = unknown>(
 	const enableWorker = () => matrix.value?.enableWorker();
 
 	watchDebounced(
-		[width, gap, columnCount, breakpoints],
+		[width, gap, columnCount, () => unref(breakpoints)],
 		async () => {
 			if (!isLayoutReady.value) {
 				matrixColumns.value = [];
