@@ -1,6 +1,6 @@
 {
 	"name": "vue-masonry-blade",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"private": false,
 	"description": "Composable masonry and virtualization hooks powered by masonry-blade",
 	"keywords": [
@@ -55,7 +55,7 @@
 	},
 	"dependencies": {
 		"@vueuse/core": "^14.2.1",
-		"masonry-blade": "^2.0.2"
+		"masonry-blade": "2.0.3"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/core": "^0.18.2",
@@ -96,10 +96,5 @@
 	"volta": {
 		"node": "22.22.0",
 		"pnpm": "10.32.1"
-	},
-	"pnpm": {
-		"overrides": {
-			"masonry-blade": "2.0.2"
-		}
 	}
 }
