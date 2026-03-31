@@ -73,15 +73,12 @@ describe('useMasonry', () => {
 			append: vi.fn(),
 			clear: vi.fn(),
 			containerHeight: shallowRef(0),
-			disableWorker: vi.fn(),
-			enableWorker: vi.fn(),
 			matrix,
 			matrixColumns,
 			recreate: vi.fn(),
 			resolvedColumnCount: computed(() => columnCount.value),
 			sort: vi.fn(),
 			sourceItems: shallowRef<readonly Readonly<TestSourceItem>[]>([]),
-			terminateWorker: vi.fn(),
 		});
 
 		composableMocks.useVirtualMasonryMock.mockReturnValue({
@@ -131,9 +128,6 @@ describe('useMasonry', () => {
 		const recreate = vi.fn();
 		const clear = vi.fn();
 		const sort = vi.fn();
-		const disableWorker = vi.fn();
-		const enableWorker = vi.fn();
-		const terminateWorker = vi.fn();
 		const matrix = shallowRef({ sort: vi.fn() } as never);
 		const matrixColumns = shallowRef<ReadonlyMatrix<TestMeta>>([
 			[
@@ -163,15 +157,12 @@ describe('useMasonry', () => {
 			append,
 			clear,
 			containerHeight,
-			disableWorker,
-			enableWorker,
 			matrix,
 			matrixColumns,
 			recreate,
 			resolvedColumnCount,
 			sort,
 			sourceItems,
-			terminateWorker,
 		});
 
 		composableMocks.useVirtualMasonryMock.mockReturnValue({
@@ -191,9 +182,6 @@ describe('useMasonry', () => {
 		expect(hook.recreate).toBe(recreate);
 		expect(hook.clear).toBe(clear);
 		expect(hook.sort).toBe(sort);
-		expect(hook.disableWorker).toBe(disableWorker);
-		expect(hook.enableWorker).toBe(enableWorker);
-		expect(hook.terminateWorker).toBe(terminateWorker);
 		expect(hook.matrix).toBe(matrix);
 		expect(hook.matrixColumns).toBe(matrixColumns);
 		expect(hook.sourceItems).toBe(sourceItems);

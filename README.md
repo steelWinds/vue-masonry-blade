@@ -78,16 +78,19 @@ const gap = ref(12);
 const overscanPx = ref(300);
 const breakpoints = shallowRef({ 0: 1, 640: 2, 960: 3, 1280: 4 });
 
-const { containerHeight, recreate, visibleItems, onCreated, disableWorker } =
-	useMasonry<Meta>(rootRef, {
+const { containerHeight, recreate, visibleItems, onCreated } = useMasonry<Meta>(
+	rootRef,
+	{
 		columnCount,
 		gap,
 		overscanPx,
 		breakpoints,
-	});
+	},
+);
 
-// For disable worker
-onCreated(disableWorker);
+onCreated((matrix) => {
+	matrix.disableWorker();
+});
 
 onMounted(async () => {
 	await recreate(items.value);
@@ -157,9 +160,6 @@ const {
 	clear,
 	sort,
 	onCreated,
-	disableWorker,
-	enableWorker,
-	terminateWorker,
 	visibleMatrix,
 	visibleItems,
 	rangeStart,
@@ -191,15 +191,16 @@ const {
 	clear,
 	sort,
 	onCreated,
-	disableWorker,
-	enableWorker,
-	terminateWorker,
 } = useMasonryMatrix(rootRef, gap, columnCount, breakpoints);
 ```
 
 > The hook keeps the matrix state synchronized with the container width and recreates the matrix when the width, `gap`, number of columns, or breakpoints change.
 >
 > `onCreated((matrix) => {})` lets you subscribe to the first creation of the internal `MasonryMatrix` instance.
+>
+> When modifying breakpoints, you must replace the entire object rather than mutate it in place.
+>
+> Worker control is available directly on `matrix.value` when you need it.
 
 #### `useVirtualMasonry()`
 

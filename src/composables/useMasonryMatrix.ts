@@ -89,7 +89,7 @@ export const useMasonryMatrix = <Meta = unknown>(
 		sourceItems.value = items;
 
 		if (!isLayoutReady.value) {
-			matrixColumns.value = [];
+			resetLayoutState();
 
 			return matrixColumns.value;
 		}
@@ -98,7 +98,7 @@ export const useMasonryMatrix = <Meta = unknown>(
 			const instance = ensureMatrix();
 
 			if (!instance) {
-				matrixColumns.value = [];
+				resetLayoutState();
 
 				return matrixColumns.value;
 			}
@@ -161,15 +161,16 @@ export const useMasonryMatrix = <Meta = unknown>(
 	};
 
 	const clear = () => recreate([]);
-	const terminateWorker = () => matrix.value?.terminateWorker();
-	const disableWorker = () => matrix.value?.disableWorker();
-	const enableWorker = () => matrix.value?.enableWorker();
+	const resetLayoutState = () => {
+		containerHeight.value = 0;
+		matrixColumns.value = [];
+	};
 
 	watchDebounced(
 		[width, gap, columnCount, () => unref(breakpoints)],
 		async () => {
 			if (!isLayoutReady.value) {
-				matrixColumns.value = [];
+				resetLayoutState();
 
 				return;
 			}
@@ -184,15 +185,13 @@ export const useMasonryMatrix = <Meta = unknown>(
 	);
 
 	tryOnBeforeUnmount(() => {
-		terminateWorker();
+		matrix.value?.terminateWorker();
 	});
 
 	return {
 		append,
 		clear,
 		containerHeight,
-		disableWorker,
-		enableWorker,
 		matrix,
 		matrixColumns,
 		onCreated: createdHook.on,
@@ -200,6 +199,5 @@ export const useMasonryMatrix = <Meta = unknown>(
 		resolvedColumnCount,
 		sort,
 		sourceItems,
-		terminateWorker,
 	};
 };

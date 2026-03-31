@@ -120,7 +120,11 @@ export const useVirtualMasonry = <Meta = unknown>(
 			}
 
 			visibleItems.value = sorted;
-		} catch {}
+		} catch {
+			if (runId === latestRunId) {
+				visibleItems.value = [];
+			}
+		}
 	};
 
 	const scheduleSort = async () => {

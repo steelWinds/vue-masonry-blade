@@ -433,7 +433,7 @@ describe('useVirtualMasonry', () => {
 		expect(hook.visibleItems.value).toStrictEqual(secondSorted);
 	});
 
-	test('swallows sort errors and keeps the current visibleItems stable', async () => {
+	test('resets visibleItems when sort fails', async () => {
 		const matrix = createMatrixFacade();
 		const stableItems: TestVisibleItems = [
 			createItem({ height: 100, id: 'stable', y: 50 }),
@@ -459,6 +459,6 @@ describe('useVirtualMasonry', () => {
 
 		await flush();
 
-		expect(hook.visibleItems.value).toStrictEqual(stableItems);
+		expect(hook.visibleItems.value).toStrictEqual([]);
 	});
 });
