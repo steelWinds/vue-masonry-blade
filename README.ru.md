@@ -78,11 +78,18 @@ const gap = ref(12);
 const overscanPx = ref(300);
 const breakpoints = shallowRef({ 0: 1, 640: 2, 960: 3, 1280: 4 });
 
-const { containerHeight, recreate, visibleItems } = useMasonry<Meta>(rootRef, {
-	columnCount,
-	gap,
-	overscanPx,
-	breakpoints,
+const { containerHeight, recreate, visibleItems, onCreated } = useMasonry<Meta>(
+	rootRef,
+	{
+		columnCount,
+		gap,
+		overscanPx,
+		breakpoints,
+	},
+);
+
+onCreated((matrix) => {
+	matrix.disableWorker();
 });
 
 onMounted(async () => {
@@ -153,9 +160,7 @@ const {
 	recreate,
 	clear,
 	sort,
-	disableWorker,
-	enableWorker,
-	terminateWorker,
+	onCreated,
 	visibleMatrix,
 	visibleItems,
 	rangeStart,
@@ -186,13 +191,17 @@ const {
 	recreate,
 	clear,
 	sort,
-	disableWorker,
-	enableWorker,
-	terminateWorker,
+	onCreated,
 } = useMasonryMatrix(rootRef, gap, columnCount, breakpoints);
 ```
 
 > Хук держит состояние матрицы синхронизированным с шириной контейнера и пересоздаёт ее при изменении ширины, `gap`, числа колонок или breakpoints.
+>
+> Через `onCreated((matrix) => {})` можно подписаться на первое создание внутреннего экземпляра `MasonryMatrix`.
+>
+> При изменении breakpoints необходимо заменять весь объект целиком, а не мутировать его на месте.
+>
+> Для управления worker'ом при необходимости используйте `matrix.value` напрямую.
 
 #### `useVirtualMasonry()`
 

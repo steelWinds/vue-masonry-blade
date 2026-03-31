@@ -5,11 +5,13 @@ import {
 } from 'masonry-blade';
 import {
 	type MaybeComputedElementRef,
+	createEventHook,
 	tryOnBeforeUnmount,
 	useElementSize,
 	watchDebounced,
 } from '@vueuse/core';
 import { type MaybeRef, computed, shallowRef, unref } from 'vue';
+import { useRunExclusive } from 'src/helpers';
 
 export type Breakpoints = Readonly<Record<number, number>>;
 
@@ -25,10 +27,11 @@ export const useMasonryMatrix = <Meta = unknown>(
 		[],
 	);
 	const containerHeight = shallowRef(0);
+	const createdHook = createEventHook<MasonryMatrix<Meta>>();
 
 	const { width } = useElementSize(rootRef);
 
-	let operationQueue = Promise.resolve();
+	const { runExclusive } = useRunExclusive();
 
 	const normalizedBreakpoints = computed(() =>
 		Object.entries(unref(breakpoints) ?? {})
@@ -52,17 +55,6 @@ export const useMasonryMatrix = <Meta = unknown>(
 		() => width.value > 0 && resolvedColumnCount.value > 0,
 	);
 
-	const runExclusive = <T>(task: () => Promise<T>) => {
-		const nextTask = operationQueue.then(task, task);
-
-		operationQueue = nextTask.then(
-			() => undefined,
-			() => undefined,
-		);
-
-		return nextTask;
-	};
-
 	const ensureMatrix = () => {
 		if (!isLayoutReady.value) {
 			return null;
@@ -74,6 +66,8 @@ export const useMasonryMatrix = <Meta = unknown>(
 				resolvedColumnCount.value,
 				unref(gap),
 			);
+
+			void createdHook.trigger(matrix.value);
 		}
 
 		return matrix.value;
@@ -85,7 +79,7 @@ export const useMasonryMatrix = <Meta = unknown>(
 		sourceItems.value = items;
 
 		if (!isLayoutReady.value) {
-			matrixColumns.value = [];
+			resetLayoutState();
 
 			return matrixColumns.value;
 		}
@@ -94,7 +88,7 @@ export const useMasonryMatrix = <Meta = unknown>(
 			const instance = ensureMatrix();
 
 			if (!instance) {
-				matrixColumns.value = [];
+				resetLayoutState();
 
 				return matrixColumns.value;
 			}
@@ -157,15 +151,16 @@ export const useMasonryMatrix = <Meta = unknown>(
 	};
 
 	const clear = () => recreate([]);
-	const terminateWorker = () => matrix.value?.terminateWorker();
-	const disableWorker = () => matrix.value?.disableWorker();
-	const enableWorker = () => matrix.value?.enableWorker();
+	const resetLayoutState = () => {
+		containerHeight.value = 0;
+		matrixColumns.value = [];
+	};
 
 	watchDebounced(
 		[width, gap, columnCount, () => unref(breakpoints)],
 		async () => {
 			if (!isLayoutReady.value) {
-				matrixColumns.value = [];
+				resetLayoutState();
 
 				return;
 			}
@@ -173,28 +168,26 @@ export const useMasonryMatrix = <Meta = unknown>(
 			await recreate();
 		},
 		{
-			debounce: 100,
+			debounce: 32,
 			flush: 'post',
 			immediate: true,
 		},
 	);
 
 	tryOnBeforeUnmount(() => {
-		terminateWorker();
+		matrix.value?.terminateWorker();
 	});
 
 	return {
 		append,
 		clear,
 		containerHeight,
-		disableWorker,
-		enableWorker,
 		matrix,
 		matrixColumns,
+		onCreated: createdHook.on,
 		recreate,
 		resolvedColumnCount,
 		sort,
 		sourceItems,
-		terminateWorker,
 	};
 };

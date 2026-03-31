@@ -11,9 +11,12 @@ import {
 	computed,
 	shallowRef,
 	unref,
-	watch,
 } from 'vue';
-import { useElementBounding, useParentElement } from '@vueuse/core';
+import {
+	useElementBounding,
+	useParentElement,
+	watchThrottled,
+} from '@vueuse/core';
 
 export interface UseVirtualMasonryOptions {
 	overscanPx?: MaybeRef<number | undefined>;
@@ -96,16 +99,15 @@ export const useVirtualMasonry = <Meta = unknown>(
 	const visibleItems = shallowRef<ReadonlySortItems<Meta>>([]);
 
 	let activeSort = false;
-	let rerunRequested = false;
-	let latestRunId = 0;
+	let requestedRunId = 0;
 
-	const updateVisibleItems = async (runId: number) => {
+	const syncVisibleItems = async (runId: number) => {
 		const currentMatrix = matrix.value;
 		const currentVisibleMatrix = visibleMatrix.value;
 		const hasItems = currentVisibleMatrix.some((column) => column.length > 0);
 
 		if (!currentMatrix || !hasItems) {
-			if (runId === latestRunId) {
+			if (runId === requestedRunId) {
 				visibleItems.value = [];
 			}
 
@@ -115,39 +117,41 @@ export const useVirtualMasonry = <Meta = unknown>(
 		try {
 			const sorted = await currentMatrix.sort(currentVisibleMatrix);
 
-			if (runId !== latestRunId) {
+			if (runId !== requestedRunId) {
 				return;
 			}
 
 			visibleItems.value = sorted;
-		} catch {}
+		} catch {
+			if (runId === requestedRunId) {
+				visibleItems.value = [];
+			}
+		}
 	};
 
 	const scheduleSort = async () => {
-		latestRunId += 1;
+		requestedRunId += 1;
 
 		if (activeSort) {
-			rerunRequested = true;
-
 			return;
 		}
 
 		activeSort = true;
 
 		try {
+			let runId = 0;
+
 			do {
-				rerunRequested = false;
+				runId = requestedRunId;
 
-				const runId = latestRunId;
-
-				await updateVisibleItems(runId);
-			} while (rerunRequested);
+				await syncVisibleItems(requestedRunId);
+			} while (runId !== requestedRunId);
 		} finally {
 			activeSort = false;
 		}
 	};
 
-	watch(
+	watchThrottled(
 		[matrix, visibleMatrix],
 		() => {
 			void scheduleSort();
@@ -155,6 +159,7 @@ export const useVirtualMasonry = <Meta = unknown>(
 		{
 			deep: false,
 			immediate: true,
+			throttle: 32,
 		},
 	);
 

@@ -289,6 +289,32 @@ describe('useMasonryMatrix', () => {
 			});
 		});
 
+		test('fires onCreated when the matrix instance is created for the first time', async () => {
+			const { columnCount, gap, hook } = mountHook({
+				columnCount: 3,
+				gap: 16,
+				width: 960,
+			});
+			const onCreated = vi.fn();
+
+			hook.onCreated(onCreated);
+
+			await flushDebounce();
+
+			const instance = getLastInstance();
+
+			expect(onCreated).toHaveBeenCalledTimes(1);
+			expect(onCreated).toHaveBeenCalledWith(instance);
+
+			mocks.width!.value = 1200;
+			columnCount.value = 4;
+			gap.value = 24;
+
+			await flushDebounce();
+
+			expect(onCreated).toHaveBeenCalledTimes(1);
+		});
+
 		test('resolves column count from normalized breakpoints', async () => {
 			const { breakpoints, columnCount, hook } = mountHook({
 				columnCount: 1,
@@ -611,6 +637,36 @@ describe('useMasonryMatrix', () => {
 			});
 		});
 
+		test('resets matrixColumns and containerHeight when layout becomes not ready', async () => {
+			const { hook } = mountHook({
+				columnCount: 2,
+				gap: 12,
+				width: 700,
+			});
+
+			await flushDebounce();
+
+			const instance = getLastInstance();
+			const recreatedColumns = createMatrix(1, 1);
+
+			instance.recreate.mockResolvedValueOnce(recreatedColumns);
+			instance.getState.mockReturnValue({
+				columnsHeights: new Float64Array([120, 260]),
+			});
+
+			await hook.recreate([createSourceItem(), createSourceItem()]);
+
+			expect(hook.matrixColumns.value).toBe(recreatedColumns);
+			expect(hook.containerHeight.value).toBe(260);
+
+			mocks.width!.value = 0;
+
+			await flushDebounce();
+
+			expect(hook.matrixColumns.value).toStrictEqual([]);
+			expect(hook.containerHeight.value).toBe(0);
+		});
+
 		test('recreates layout when breakpoints change the resolved column count', async () => {
 			const { breakpoints, hook } = mountHook({
 				breakpoints: {
@@ -660,7 +716,7 @@ describe('useMasonryMatrix', () => {
 			});
 		});
 
-		test('delegates worker controls and terminates worker on unmount', async () => {
+		test('keeps worker control on the matrix instance and terminates worker on unmount', async () => {
 			const { hook } = mountHook({
 				columnCount: 2,
 				gap: 12,
@@ -671,9 +727,9 @@ describe('useMasonryMatrix', () => {
 
 			const instance = getLastInstance();
 
-			hook.disableWorker();
-			hook.enableWorker();
-			hook.terminateWorker();
+			hook.matrix.value?.disableWorker();
+			hook.matrix.value?.enableWorker();
+			hook.matrix.value?.terminateWorker();
 
 			expect(instance.disableWorker).toHaveBeenCalledTimes(1);
 			expect(instance.enableWorker).toHaveBeenCalledTimes(1);
