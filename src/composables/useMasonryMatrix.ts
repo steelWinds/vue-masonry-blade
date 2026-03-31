@@ -11,6 +11,7 @@ import {
 	watchDebounced,
 } from '@vueuse/core';
 import { type MaybeRef, computed, shallowRef, unref } from 'vue';
+import { useRunExclusive } from 'src/helpers';
 
 export type Breakpoints = Readonly<Record<number, number>>;
 
@@ -30,7 +31,7 @@ export const useMasonryMatrix = <Meta = unknown>(
 
 	const { width } = useElementSize(rootRef);
 
-	let operationQueue = Promise.resolve();
+	const { runExclusive } = useRunExclusive();
 
 	const normalizedBreakpoints = computed(() =>
 		Object.entries(unref(breakpoints) ?? {})
@@ -53,17 +54,6 @@ export const useMasonryMatrix = <Meta = unknown>(
 	const isLayoutReady = computed(
 		() => width.value > 0 && resolvedColumnCount.value > 0,
 	);
-
-	const runExclusive = <T>(task: () => Promise<T>) => {
-		const nextTask = operationQueue.then(task, task);
-
-		operationQueue = nextTask.then(
-			() => undefined,
-			() => undefined,
-		);
-
-		return nextTask;
-	};
 
 	const ensureMatrix = () => {
 		if (!isLayoutReady.value) {
@@ -178,7 +168,7 @@ export const useMasonryMatrix = <Meta = unknown>(
 			await recreate();
 		},
 		{
-			debounce: 100,
+			debounce: 32,
 			flush: 'post',
 			immediate: true,
 		},

@@ -35,6 +35,7 @@ const vueuseState = vi.hoisted(() => ({
 	parentElement: null as ShallowRef<Element | null> | null,
 	rootTop: null as ShallowRef<number> | null,
 	viewportHeight: null as ShallowRef<number> | null,
+	watchThrottled: null as ReturnType<typeof vi.fn> | null,
 }));
 
 vi.mock('@vueuse/core', async () => {
@@ -52,6 +53,24 @@ vi.mock('@vueuse/core', async () => {
 		vueuseState.viewportHeight = vue.shallowRef(0);
 	}
 
+	if (!vueuseState.watchThrottled) {
+		vueuseState.watchThrottled = vi.fn(
+			(
+				source: Parameters<typeof vue.watch>[0],
+				callback: Parameters<typeof vue.watch>[1],
+				options?: {
+					deep?: boolean;
+					immediate?: boolean;
+					throttle?: number;
+				},
+			) =>
+				vue.watch(source, callback, {
+					deep: options?.deep,
+					immediate: options?.immediate,
+				}),
+		);
+	}
+
 	return {
 		useElementBounding: vi.fn((_target: unknown, options?: object) => {
 			if (options) {
@@ -65,6 +84,7 @@ vi.mock('@vueuse/core', async () => {
 			};
 		}),
 		useParentElement: vi.fn(() => vueuseState.parentElement!),
+		watchThrottled: vueuseState.watchThrottled,
 	};
 });
 
@@ -264,6 +284,26 @@ describe('useVirtualMasonry', () => {
 		expect(hook.overscanPx.value).toBe(50);
 		expect(hook.rangeStart.value).toBe(30);
 		expect(hook.rangeEnd.value).toBe(330);
+	});
+
+	test('subscribes through watchThrottled with the expected options', () => {
+		mountHook({
+			matrix: null,
+			matrixColumns: [],
+			rootTop: 0,
+			viewportHeight: 200,
+		});
+
+		expect(vueuseState.watchThrottled).toHaveBeenCalledTimes(1);
+		expect(vueuseState.watchThrottled).toHaveBeenCalledWith(
+			expect.any(Array),
+			expect.any(Function),
+			{
+				deep: false,
+				immediate: true,
+				throttle: 32,
+			},
+		);
 	});
 
 	test('builds visibleMatrix by slicing each column inside the visible range', async () => {
