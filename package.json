@@ -99,7 +99,7 @@
 	},
 	"pnpm": {
 		"overrides": {
-			"masonry-blade": "2.0.2"
+			"masonry-blade": "2.0.3"
 		}
 	}
 }
