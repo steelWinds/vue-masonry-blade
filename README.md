@@ -58,22 +58,31 @@ virtualization from `useVirtualMasonry()`.
 
 ```vue
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, shallowRef } from 'vue';
 import { getPositionedStyle, useMasonry } from 'vue-masonry-blade';
+
+interface Meta {
+	src: string;
+}
 
 const rootRef = ref<HTMLElement | null>(null);
 
-const items = ref([
+const items = shallowRef([
 	{ id: 1, width: 800, height: 600, meta: { src: '/images/1.jpg' } },
 	{ id: 2, width: 800, height: 1100, meta: { src: '/images/2.jpg' } },
 	{ id: 3, width: 800, height: 700, meta: { src: '/images/3.jpg' } },
 ]);
 
-const { containerHeight, recreate, visibleItems } = useMasonry(rootRef, {
-	columnCount: 4,
-	gap: 12,
-	overscanPx: 300,
-	breakpoints: { 0: 1, 640: 2, 960: 3, 1280: 4 },
+const columnCount = ref(4);
+const gap = ref(12);
+const overscanPx = ref(300);
+const breakpoints = shallowRef({ 0: 1, 640: 2, 960: 3, 1280: 4 });
+
+const { containerHeight, recreate, visibleItems } = useMasonry<Meta>(rootRef, {
+	columnCount,
+	gap,
+	overscanPx,
+	breakpoints,
 });
 
 onMounted(async () => {
@@ -95,7 +104,7 @@ onMounted(async () => {
 			}"
 		>
 			<img
-				:src="item.meta.src"
+				:src="item.meta?.src"
 				:alt="''"
 				:style="{ width: '100%', height: '100%', objectFit: 'cover' }"
 			/>
@@ -105,6 +114,12 @@ onMounted(async () => {
 ```
 
 > For pagination or infinite loading, use `append(items)` instead of fully rebuilding the source array.
+>
+> `items` is intentionally stored in `shallowRef(...)`. If you use
+> `ref(...)` or `reactive(...)`, Vue wraps nested items in proxies, and those
+> proxies cannot be sent to the worker through structured clone. The same
+> rule applies to every item you pass to `append()` / `recreate()` or store in
+> the matrix source.
 
 ### Nuxt / SSR
 
@@ -228,6 +243,11 @@ this shape:
 ```
 
 > `width` and `height` are the original dimensions used to calculate the final item size inside the grid.
+>
+> Keep the source collection in `shallowRef(...)` or otherwise make sure the
+> items stay plain cloneable objects. In worker mode, Vue proxies produced by
+> `ref(...)` / `reactive(...)` do not satisfy structured clone and can fail in
+> `append()` / `recreate()`.
 
 ## Contributing
 
